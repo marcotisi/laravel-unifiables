@@ -1,0 +1,30 @@
+{
+    "name": "marcotisi/laravel-unifiables",
+    "description": "Laravel 5 Unifiable Models",
+    "require": {
+        "php": ">=5.4"
+    },
+    "require-dev": {
+        "laravel/laravel": "~5.1",
+        "laravel/framework": "~5.1",
+        "phpunit/phpunit": "^3.0",
+        "fzaninotto/faker": "^1.6"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Marco Tisi",
+            "email": "marco.tisi@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "MarcoTisi\\Unifiables\\": "src/"
+        }
+    },
+    "autoload-dev": {
+      "psr-4": {
+          "MarcoTisi\\Unifiables\\Test\\": "tests"
+      }
+    }
+}
