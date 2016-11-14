@@ -1,4 +1,5 @@
 <?php
+
 namespace MarcoTisi\Unifiables\Test;
 
 use Illuminate\Filesystem\ClassFinder;
@@ -15,7 +16,7 @@ class TestCase extends \Illuminate\Foundation\Testing\TestCase
      */
     public function createApplication()
     {
-        $app = require __DIR__ . '/../vendor/laravel/laravel/bootstrap/app.php';
+        $app = require __DIR__.'/../vendor/laravel/laravel/bootstrap/app.php';
         $app->make('Illuminate\Contracts\Console\Kernel')->bootstrap();
 
         return $app;
@@ -38,7 +39,7 @@ class TestCase extends \Illuminate\Foundation\Testing\TestCase
     }
 
     /**
-     * run package database migrations
+     * run package database migrations.
      *
      * @return void
      */
@@ -47,7 +48,7 @@ class TestCase extends \Illuminate\Foundation\Testing\TestCase
         $fileSystem = new Filesystem();
         $classFinder = new ClassFinder();
 
-        foreach ($fileSystem->files(__DIR__ . "/../tests/database/migrations") as $file) {
+        foreach ($fileSystem->files(__DIR__.'/../tests/database/migrations') as $file) {
             $fileSystem->requireOnce($file);
             $migrationClass = $classFinder->findClass($file);
 
@@ -63,7 +64,7 @@ class TestCase extends \Illuminate\Foundation\Testing\TestCase
         $fileSystem = new Filesystem();
         $classFinder = new ClassFinder();
 
-        foreach ($fileSystem->files(__DIR__ . "/../tests/database/seeds") as $seeder) {
+        foreach ($fileSystem->files(__DIR__.'/../tests/database/seeds') as $seeder) {
             $fileSystem->requireOnce($seeder);
             $seederClass = $classFinder->findClass($seeder);
 
