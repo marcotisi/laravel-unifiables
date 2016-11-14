@@ -8,10 +8,10 @@ use MarcoTisi\Unifiables\Unifiable;
 
 class UnifiableTest extends TestCase
 {
-    /**
-     * A basic test example.
-     * @return void
-     */
+    public function testCreationOfInstance()
+    {
+        $this->assertInstanceOf(Unifiable::class, new Unifiable());
+    }
     public function testUnifiable()
     {
         Unifiable::addUnifiable(NewsTest::class, [
