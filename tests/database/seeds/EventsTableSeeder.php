@@ -10,14 +10,17 @@ class EventsTableSeeder extends Seeder
      */
     public function run()
     {
-        factory()
-            ->define(MarcoTisi\Unifiables\Test\EventTest::class, function (Faker\Generator $faker) {
+        $factory = app(\Illuminate\Database\Eloquent\Factory::class);
+        $factory
+            ->define(\MarcoTisi\Unifiables\Test\Models\EventTest::class, function (Faker\Generator $faker) {
                 return [
                     'name'    => $faker->sentence(3),
                     'venue'   => $faker->address,
                     'held_at' => $faker->dateTimeBetween('-2 years', '+1 years'),
                 ];
-            })
+            });
+        $factory
+            ->of(\MarcoTisi\Unifiables\Test\Models\EventTest::class)
             ->times(50)
             ->create();
     }

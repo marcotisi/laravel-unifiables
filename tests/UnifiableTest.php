@@ -24,6 +24,6 @@ class UnifiableTest extends TestCase
             'date'     => 'held_at',
         ]);
 
-        $this->assertTrue(true);
+        $this->assertEquals(100, Unifiable::count());
     }
 }
