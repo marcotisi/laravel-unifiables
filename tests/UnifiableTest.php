@@ -12,6 +12,7 @@ class UnifiableTest extends TestCase
     {
         $this->assertInstanceOf(Unifiable::class, new Unifiable());
     }
+
     public function testUnifiable()
     {
         Unifiable::addUnifiable(NewsTest::class, [
