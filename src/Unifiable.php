@@ -49,17 +49,17 @@ class Unifiable extends Model
             $query = $callback($query, $unifiable, $fields, $callback);
         }
 
-        $query->selectRaw(\DB::connection()->getPdo()->quote($class) . ' AS unifiable_type');
-        $query->selectRaw($unifiable->getKeyName() . ' AS unifiable_id');
+        $query->selectRaw(\DB::connection()->getPdo()->quote($class).' AS unifiable_type');
+        $query->selectRaw($unifiable->getKeyName().' AS unifiable_id');
         foreach (static::$unifiableFields as $unifiableField) {
             if ($mappedField = array_get($fields, $unifiableField)) {
-                $query->selectRaw($mappedField . ' AS ' . $unifiableField);
+                $query->selectRaw($mappedField.' AS '.$unifiableField);
                 continue;
             }
             $query->addSelect($unifiableField);
         }
 
-        if (!static::$unifiableQuery) {
+        if (! static::$unifiableQuery) {
             static::$unifiableQuery = $query;
         } else {
             static::$unifiableQuery->unionAll($query);
@@ -102,7 +102,7 @@ class Unifiable extends Model
 
     public function getTable()
     {
-        return \DB::raw('(' . static::$unifiableQuery->toSql() . ') AS unifiables');
+        return \DB::raw('('.static::$unifiableQuery->toSql().') AS unifiables');
     }
 
     public function unifiable()
