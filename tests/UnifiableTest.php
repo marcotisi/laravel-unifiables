@@ -13,18 +13,29 @@ class UnifiableTest extends TestCase
         $this->assertInstanceOf(Unifiable::class, new Unifiable());
     }
 
-    public function testUnifiable()
+    public function testBootWithUnifiables()
     {
-        Unifiable::addUnifiable(NewsTest::class, [
+        $focused = new FocusedTest();
+
+        $this->assertArrayHasKey('MarcoTisi\Unifiables\Test\Models\NewsTest', $focused->getUnifiables());
+        $this->assertArrayHasKey('MarcoTisi\Unifiables\Test\Models\EventTest', $focused->getUnifiables());
+    }
+
+    public function testAddUnifiable()
+    {
+        $unifiable = new Unifiable();
+
+        $unifiable->addUnifiable(NewsTest::class, [
             'date' => 'published_at',
         ]);
 
-        Unifiable::addUnifiable(EventTest::class, [
+        $unifiable->addUnifiable(EventTest::class, [
             'title'    => 'name',
             'subtitle' => 'venue',
             'date'     => 'held_at',
         ]);
 
-        $this->assertEquals(100, Unifiable::count());
+        $this->assertArrayHasKey('MarcoTisi\Unifiables\Test\Models\NewsTest', $unifiable->getUnifiables());
+        $this->assertArrayHasKey('MarcoTisi\Unifiables\Test\Models\EventTest', $unifiable->getUnifiables());
     }
 }

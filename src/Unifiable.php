@@ -7,10 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class Unifiable extends Model
 {
-    /**
-     * {@inheritdoc}
-     */
-    protected $primaryKey = null;
+    protected static $unifiableQuery = null;
+
+    protected static $unifiableFields = [
+    ];
+
+    protected static $unifiables = [
+    ];
 
     /**
      * {@inheritdoc}
@@ -22,66 +25,84 @@ class Unifiable extends Model
      */
     public $timestamps = false;
 
-    protected static $unifiableQuery = null;
+    /**
+     * {@inheritdoc}
+     */
+    protected $primaryKey = null;
 
-    protected static $unifiableFields = [
-        'title',
-        'subtitle',
-        'date',
-    ];
-
-    protected static $unifiables = [
-    ];
-
-    protected static function boot()
-    {
-        parent::boot();
-
-        foreach (static::$unifiables as $unifiable) {
-            static::addUnifiable($unifiable);
-        }
-    }
-
-    public static function addUnifiable($unifiable, $mappings = [], $callback = null)
+    public static function addUnifiable($unifiable, $fields = [], $callback = null)
     {
         if (is_array($unifiable)) {
             $unifiable = array_first(array_keys($unifiable));
-            $mappings = array_values($mappings);
-            $callback = $mappings;
+            $fields = array_values($fields);
+            $callback = $fields;
         }
         if (is_string($unifiable)) {
-            $unifiable = new $unifiable();
+            $unifiable = app($unifiable);
         }
         if ($unifiable instanceof Builder) {
             $unifiable = $unifiable->getModel();
         }
+        $class = get_class($unifiable);
         $query = $unifiable->newQuery();
         if (is_callable($callback)) {
-            $query = $callback($query, $unifiable, $mappings, $callback);
+            $query = $callback($query, $unifiable, $fields, $callback);
         }
 
-        $query->selectRaw(\DB::connection()->getPdo()->quote(get_class($unifiable)).' AS unifiable_type');
-        $query->selectRaw($unifiable->getKeyName().' AS unifiable_id');
+        $query->selectRaw(\DB::connection()->getPdo()->quote($class) . ' AS unifiable_type');
+        $query->selectRaw($unifiable->getKeyName() . ' AS unifiable_id');
         foreach (static::$unifiableFields as $unifiableField) {
-            if ($mappedField = array_get($mappings, $unifiableField)) {
-                $query->selectRaw($mappedField.' AS '.$unifiableField);
+            if ($mappedField = array_get($fields, $unifiableField)) {
+                $query->selectRaw($mappedField . ' AS ' . $unifiableField);
                 continue;
             }
             $query->addSelect($unifiableField);
         }
 
-        if (! static::$unifiableQuery) {
+        if (!static::$unifiableQuery) {
             static::$unifiableQuery = $query;
         } else {
             static::$unifiableQuery->unionAll($query);
         }
 
-        return new static;
+        return static::$unifiables[$class] = $fields;
+    }
+
+    /**
+     * @return array
+     */
+    public function getUnifiableFields(): array
+    {
+        return static::$unifiableFields;
+    }
+
+    /**
+     * @param array $unifiableFields
+     */
+    public function setUnifiableFields(array $unifiableFields)
+    {
+        static::$unifiableFields = $unifiableFields;
+    }
+
+    /**
+     * @return array
+     */
+    public function getUnifiables(): array
+    {
+        return static::$unifiables;
+    }
+
+    /**
+     * @param array $unifiables
+     */
+    public function setUnifiables(array $unifiables)
+    {
+        static::$unifiables = $unifiables;
     }
 
     public function getTable()
     {
-        return \DB::raw('('.static::$unifiableQuery->toSql().') AS unifiables');
+        return \DB::raw('(' . static::$unifiableQuery->toSql() . ') AS unifiables');
     }
 
     public function unifiable()
