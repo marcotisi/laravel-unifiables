@@ -107,7 +107,8 @@ class Unifiable extends Model
     {
         $query = static::$builder->getQuery();
         $grammar = $query->getGrammar();
-        return $query->raw('('.$query->toSql().') AS ' . $grammar->wrap('unifiables'));
+
+        return $query->raw('('.$query->toSql().') AS '.$grammar->wrap('unifiables'));
     }
 
     public function unifiable()
