@@ -7,7 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Unifiable extends Model
 {
-    protected static $unifiableQuery = null;
+    /**
+     * @var \Illuminate\Database\Eloquent\Builder
+     */
+    protected static $builder = null;
 
     protected static $unifiableFields = [
     ];
@@ -44,25 +47,25 @@ class Unifiable extends Model
             $unifiable = $unifiable->getModel();
         }
         $class = get_class($unifiable);
-        $query = $unifiable->newQuery();
+        $builder = $unifiable->newQuery();
         if (is_callable($callback)) {
-            $query = $callback($query, $unifiable, $fields, $callback);
+            $builder = $callback($builder, $unifiable, $fields, $callback);
         }
 
-        $query->selectRaw(\DB::connection()->getPdo()->quote($class).' AS unifiable_type');
-        $query->selectRaw($unifiable->getKeyName().' AS unifiable_id');
+        $builder->selectRaw(app('db')->connection()->getPdo()->quote($class).' AS unifiable_type');
+        $builder->selectRaw($unifiable->getKeyName().' AS unifiable_id');
         foreach (static::$unifiableFields as $unifiableField) {
             if ($mappedField = array_get($fields, $unifiableField)) {
-                $query->selectRaw($mappedField.' AS '.$unifiableField);
+                $builder->selectRaw($mappedField.' AS '.$unifiableField);
                 continue;
             }
-            $query->addSelect($unifiableField);
+            $builder->addSelect($unifiableField);
         }
 
-        if (! static::$unifiableQuery) {
-            static::$unifiableQuery = $query;
+        if (! static::$builder) {
+            static::$builder = $builder;
         } else {
-            static::$unifiableQuery->unionAll($query);
+            static::$builder->unionAll($builder);
         }
 
         return static::$unifiables[$class] = $fields;
@@ -102,7 +105,9 @@ class Unifiable extends Model
 
     public function getTable()
     {
-        return \DB::raw('('.static::$unifiableQuery->toSql().') AS unifiables');
+        $query = static::$builder->getQuery();
+        $grammar = $query->getGrammar();
+        return $query->raw('('.$query->toSql().') AS ' . $grammar->wrap('unifiables'));
     }
 
     public function unifiable()
